@@ -17,5 +17,5 @@ BACKLIGHT_ENABLE = no          # Enable keyboard backlight functionality
 RGBLIGHT_ENABLE = no           # Enable keyboard RGB underglow
 AUDIO_ENABLE = no              # Audio output
 RGB_MATRIX_ENABLE = no        # Use RGB matrix
-RGB_MATRIX_DRIVER = IS31FL3733
+RGB_MATRIX_DRIVER = is31fl3733
 NO_USB_STARTUP_CHECK = no      # Disable initialization only when usb is plugged in
