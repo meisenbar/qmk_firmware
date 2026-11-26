@@ -31,8 +31,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [2] = LAYOUT(
         _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,
-        _______, RM_TOGG, _______, RM_HUEU, RM_HUED, RM_SATU, RM_SATD, RM_VALU, RM_VALD, RM_NEXT, _______, _______, _______, QK_BOOT,
-        _______, _______, _______, _______, _______, _______, _______, _______, RM_SPDU, RM_SPDD, _______, _______,          EE_CLR,
+        _______, RM_TOGG, _______, _______, _______, _______, _______, RM_VALU, RM_VALD, _______, _______, _______, _______, QK_BOOT,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          EE_CLR,
         _______,          _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______,                            _______,                   _______, _______, _______, _______, _______
     ),
@@ -123,4 +123,9 @@ void housekeeping_task_user(void) {
         blink_active = false;
         if (blink_then_disable) rgb_matrix_disable();
     }
+}
+
+// Only the dark BLANK effect: undo any effect picked via VIA/qmk_hid on every boot.
+void keyboard_post_init_user(void) {
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_CUSTOM_BLANK);
 }
