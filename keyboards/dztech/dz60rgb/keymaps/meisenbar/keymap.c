@@ -44,3 +44,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, KC_P0,   KC_PDOT,                            KC_PENT,                   KC_P0,   KC_PDOT, _______, _______, _______
     )
 };
+
+// Flow Tap, except right after Space: a word-initial capital needs RSFT_T(KC_SLSH) to hold.
+uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_keycode) {
+    if (prev_keycode == KC_SPC) return 0;
+    if (is_flow_tap_key(keycode) && is_flow_tap_key(prev_keycode)) return FLOW_TAP_TERM;
+    return 0;
+}

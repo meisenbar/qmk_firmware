@@ -4,3 +4,4 @@
 
 #define TAPPING_TERM 105
 #define FLOW_TAP_TERM 150
+#define PERMISSIVE_HOLD
