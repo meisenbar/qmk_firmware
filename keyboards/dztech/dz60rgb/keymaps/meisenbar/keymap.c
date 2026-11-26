@@ -84,6 +84,12 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
     }
 }
 
+#define BLINK_MS 150
+static bool     blink_active;
+static bool     blink_then_disable;
+static uint8_t  blink_count;
+static uint16_t blink_timer;
+
 bool rgb_matrix_indicators_user(void) {
     uint8_t v = rgb_matrix_get_val();
     for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
@@ -91,5 +97,30 @@ bool rgb_matrix_indicators_user(void) {
             rgb_matrix_set_color(i, override_rgb[i][0] * v / 255, override_rgb[i][1] * v / 255, override_rgb[i][2] * v / 255);
         }
     }
+    if (blink_active) {
+        uint8_t tab = g_led_config.matrix_co[1][0];
+        bool    on  = (timer_elapsed(blink_timer) / BLINK_MS) % 2 == 0;
+        if (tab != NO_LED) rgb_matrix_set_color(tab, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0);
+    }
     return true;
+}
+
+// RM_TOGG feedback: blink the Tab LED white. On->off blinks once and disables afterwards; off->on enables, then blinks 3 times.
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (keycode != RM_TOGG) return true;
+    if (record->event.pressed && !blink_active) {
+        blink_then_disable = rgb_matrix_is_enabled();
+        blink_count        = blink_then_disable ? 1 : 3;
+        if (!blink_then_disable) rgb_matrix_enable();
+        blink_active = true;
+        blink_timer  = timer_read();
+    }
+    return false;
+}
+
+void housekeeping_task_user(void) {
+    if (blink_active && timer_elapsed(blink_timer) >= 2 * BLINK_MS * blink_count) {
+        blink_active = false;
+        if (blink_then_disable) rgb_matrix_disable();
+    }
 }

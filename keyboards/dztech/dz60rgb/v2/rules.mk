@@ -20,3 +20,4 @@ RGB_MATRIX_ENABLE = yes       # Use RGB matrix
 NO_USB_STARTUP_CHECK = no      # Disable initialization only when usb is plugged in
 VIA_ENABLE = yes
 LTO_ENABLE = yes
+RGB_MATRIX_CUSTOM_USER = yes
