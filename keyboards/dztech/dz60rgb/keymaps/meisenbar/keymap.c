@@ -24,7 +24,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [1] = LAYOUT(
         TO(3),   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,
-        _______, _______, _______,   RALT(KC_5), _______, _______, KC_CALC, RALT(KC_Y), KC_INS,  RALT(KC_P), KC_PSCR, KC_SCRL, KC_PAUS, QK_BOOT,
+        _______, _______, _______,   RALT(KC_5), RM_TOGG, _______, KC_CALC, RALT(KC_Y), KC_INS,  RALT(KC_P), KC_PSCR, KC_SCRL, KC_PAUS, QK_BOOT,
         _______, RALT(KC_Q), RALT(KC_S), _______, _______, _______, KC_LEFT, KC_DOWN, KC_UP, KC_RGHT, KC_HOME, KC_GRV,   EE_CLR,
         _______,          _______, _______, _______, _______, _______, NK_TOGG, _______, _______, KC_END,  KC_RSFT, KC_VOLU, KC_MUTE,
         _______, _______, _______,                            TO(4),                     KC_MPLY, _______, KC_MPRV, KC_VOLD, KC_MNXT
@@ -50,4 +50,46 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_
     if (prev_keycode == KC_SPC) return 0;
     if (is_flow_tap_key(keycode) && is_flow_tap_key(prev_keycode)) return FLOW_TAP_TERM;
     return 0;
+}
+
+// Per-key colour overrides set by a host script over VIA's custom channel (RAM only).
+// SET:   [0x07, 0x00, 0x01, n, (led, r, g, b) * n]   CLEAR: [0x07, 0x00, 0x02]
+static uint8_t override_rgb[RGB_MATRIX_LED_COUNT][3];
+static uint8_t override_set[(RGB_MATRIX_LED_COUNT + 7) / 8];
+
+void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
+    if (length < 3 || data[1] != id_custom_channel) {
+        data[0] = id_unhandled;
+        return;
+    }
+    switch (data[2]) {
+        case 0x01: {
+            if (length < 4) return;
+            uint8_t n = data[3];
+            for (uint8_t k = 0; k < n && 4 + 4 * k + 3 < length; k++) {
+                uint8_t *e = &data[4 + 4 * k];
+                if (e[0] >= RGB_MATRIX_LED_COUNT) continue;
+                override_rgb[e[0]][0] = e[1];
+                override_rgb[e[0]][1] = e[2];
+                override_rgb[e[0]][2] = e[3];
+                override_set[e[0] / 8] |= 1 << (e[0] % 8);
+            }
+            break;
+        }
+        case 0x02:
+            memset(override_set, 0, sizeof(override_set));
+            break;
+        default:
+            data[0] = id_unhandled;
+    }
+}
+
+bool rgb_matrix_indicators_user(void) {
+    uint8_t v = rgb_matrix_get_val();
+    for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+        if (override_set[i / 8] & (1 << (i % 8))) {
+            rgb_matrix_set_color(i, override_rgb[i][0] * v / 255, override_rgb[i][1] * v / 255, override_rgb[i][2] * v / 255);
+        }
+    }
+    return true;
 }
