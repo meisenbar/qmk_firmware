@@ -98,14 +98,14 @@ bool rgb_matrix_indicators_user(void) {
         }
     }
     if (blink_active) {
-        uint8_t tab = g_led_config.matrix_co[1][0];
+        uint8_t led = g_led_config.matrix_co[4][5]; // spacebar
         bool    on  = (timer_elapsed(blink_timer) / BLINK_MS) % 2 == 0;
-        if (tab != NO_LED) rgb_matrix_set_color(tab, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0);
+        if (led != NO_LED) rgb_matrix_set_color(led, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0, on ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : 0);
     }
     return true;
 }
 
-// RM_TOGG feedback: blink the Tab LED white. On->off blinks once and disables afterwards; off->on enables, then blinks 3 times.
+// RM_TOGG feedback: blink the spacebar LED white. On->off blinks once and disables afterwards; off->on enables, then blinks 3 times.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (keycode != RM_TOGG) return true;
     if (record->event.pressed && !blink_active) {
