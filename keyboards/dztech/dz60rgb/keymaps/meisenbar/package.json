@@ -1,0 +1,8 @@
+{
+  "name": "rgbkey",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "node-hid": "^3.1.0"
+  }
+}
