@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 import { buildPackets, CLEAR, parseColor, parseKey, send } from './rgbkey.ts';
 
 // Tuned for the LEDs (5b5fc7, the brand colour, renders almost white), not the exact Teams purple.
-const TEAMS_PURPLE = '6000ff';
+const TEAMS_PURPLE = '5d30e3';
 const POLL_MS = 2000;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
