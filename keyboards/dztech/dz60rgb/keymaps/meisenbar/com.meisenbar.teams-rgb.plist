@@ -15,10 +15,12 @@
     <string>-c</string>
     <string>exec "$HOME/qmk_firmware/keyboards/dztech/dz60rgb/keymaps/meisenbar/run-node.sh" "$HOME/qmk_firmware/keyboards/dztech/dz60rgb/keymaps/meisenbar/teams-notify.ts"</string>
   </array>
-  <key>StartInterval</key>
-  <integer>15</integer>
   <key>RunAtLoad</key>
   <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
   <key>StandardOutPath</key>
   <string>/tmp/teams-rgb.log</string>
   <key>StandardErrorPath</key>
