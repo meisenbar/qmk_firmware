@@ -51,8 +51,10 @@ export function buildPackets(pairs: [number, Rgb][]): number[][] {
 }
 
 const pad = (data: number[]) => [0, ...data, ...new Array(32 - data.length).fill(0)];
+export const CLEAR = pad([0x07, 0x00, 0x02]);
 
-async function send(packets: number[][]) {
+/** Write HID reports to the keyboard; throws if it is not found. */
+export async function send(packets: number[][]) {
   const { default: HID } = await import('node-hid');
   const info = HID.devices(VID, PID).find((d) => d.usagePage === 0xff60 && d.usage === 0x61);
   if (!info?.path) throw new Error('keyboard not found — is it plugged in and running the VIA firmware?');
@@ -82,7 +84,7 @@ function selftest() {
 async function main(a: string[]) {
   if (a[0] === 'selftest') return selftest();
   if (a[0] === 'keys') return console.log(ROWS.join('\n'));
-  if (a[0] === 'clear' && a.length === 1) return send([pad([0x07, 0x00, 0x02])]);
+  if (a[0] === 'clear' && a.length === 1) return send([CLEAR]);
   if (a[0] === 'set' && a.length > 2 && a.length % 2 === 1) {
     const pairs: [number, Rgb][] = [];
     for (let i = 1; i < a.length; i += 2) {
@@ -95,7 +97,9 @@ async function main(a: string[]) {
   throw new Error('usage: node rgbkey.ts set KEY COLOR [KEY COLOR ...] | clear | keys | selftest');
 }
 
-main(process.argv.slice(2)).catch((e: Error) => {
-  console.error(e.message);
-  process.exit(1);
-});
+if (import.meta.main) {
+  main(process.argv.slice(2)).catch((e: Error) => {
+    console.error(e.message);
+    process.exit(1);
+  });
+}
